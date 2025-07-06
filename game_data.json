@@ -1,25 +1,29 @@
 {
   "resources": {
     "food": {
-      "label": "🌾 Food",
+      "label": "\ud83c\udf3e Food",
       "start": 50
     },
     "energy": {
-      "label": "⚡ Energy",
+      "label": "\u26a1 Energy",
       "start": 30
     },
     "materials": {
-      "label": "🔧 Materials",
+      "label": "\ud83d\udd27 Materials",
       "start": 40
     },
     "population": {
-      "label": "👥 Population",
+      "label": "\ud83d\udc65 Population",
       "start": 25
+    },
+    "wood": {
+      "label": "\ud83e\udeb5 Wood",
+      "start": 0
     }
   },
   "buildings": {
     "farms": {
-      "name": "🌱 Vertical Farms",
+      "name": "\ud83c\udf31 Vertical Farms",
       "cost": {
         "materials": 20,
         "energy": 10
@@ -29,7 +33,7 @@
       }
     },
     "solar": {
-      "name": "☀️ Solar Arrays",
+      "name": "\u2600\ufe0f Solar Arrays",
       "cost": {
         "materials": 25
       },
@@ -38,7 +42,7 @@
       }
     },
     "recycling": {
-      "name": "♻️ Recycling Centers",
+      "name": "\u267b\ufe0f Recycling Centers",
       "cost": {
         "materials": 30,
         "energy": 15
@@ -48,7 +52,7 @@
       }
     },
     "homes": {
-      "name": "🏠 Eco-Homes",
+      "name": "\ud83c\udfe0 Eco-Homes",
       "cost": {
         "materials": 35,
         "energy": 20
