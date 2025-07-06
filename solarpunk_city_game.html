@@ -325,6 +325,9 @@
 
 		  calculateResourceChanges();
 		  updateDisplay();
+          renderResources();
+          renderBuildings();
+          renderActions();
 		}
 		
         // Building costs and effects
@@ -565,11 +568,8 @@
 		}
 
         // Initialize game
-		renderResources();
-		renderBuildings();
-		renderActions();
-		calculateResourceChanges();
-		updateDisplay();
+		//calculateResourceChanges();
+		//updateDisplay();
     </script>
 </body>
 </html>
