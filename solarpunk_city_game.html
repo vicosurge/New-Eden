@@ -356,28 +356,41 @@
 
     <script>
         // Game state
-        let gameState = {
-            turn: 1,
-            resources: {
-                food: 50,
-                energy: 30,
-                materials: 40,
-                population: 25
-            },
-            buildings: {
-                farms: 0,
-                solar: 0,
-                recycling: 0,
-                homes: 0
-            },
-            resourceChanges: {
-                food: 0,
-                energy: 0,
-                materials: 0,
-                population: 0
-            }
-        };
+		let gameData = {};
+		let gameState = {};
+		
 
+		fetch('game_data.json')
+		  .then(response => response.json())
+		  .then(data => {
+			gameData = data;
+			initializeGame();
+		  });
+		
+		function initializeGame() {
+		  // Setup initial game state based on data
+		  gameState = {
+			turn: 1,
+			resources: {},
+			buildings: {},
+			resourceChanges: {}
+		  };
+
+		  // Initialize resources and changes
+		  for (let key in gameData.resources) {
+			gameState.resources[key] = gameData.resources[key].start;
+			gameState.resourceChanges[key] = 0;
+		  }
+
+		  // Initialize building counts
+		  for (let key in gameData.buildings) {
+			gameState.buildings[key] = 0;
+		  }
+
+		  calculateResourceChanges();
+		  updateDisplay();
+		}
+		
         // Building costs and effects
         const buildingData = {
             farms: {
