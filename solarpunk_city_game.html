@@ -313,17 +313,19 @@
 		  };
 
 		  // Initialize resources and changes
-		  for (let key in gameData.resources) {
-			gameState.resources[key] = gameData.resources[key].start;
-			gameState.resourceChanges[key] = 0;
+		  for (let id in gameData.resources) {
+			gameState.resources[id] = gameData.resources[id].start;
+			gameState.resourceChanges[id] = 0;
 		  }
 
 		  // Initialize building counts
-		  for (let key in gameData.buildings) {
-			gameState.buildings[key] = 0;
+		  for (let id in gameData.buildings) {
+			gameState.buildings[id] = 0;
 		  }
 
 		  calculateResourceChanges();
+          console.log("GameData:", gameData);
+          console.log("GameState:", gameState);
 		  updateDisplay();
           renderResources();
           renderBuildings();
@@ -353,21 +355,25 @@
         // Initialize game
 		function updateDisplay() {
 		  // Update turn
-		  document.getElementById('turn-number').textContent = gameState.turn;
+			document.getElementById('turn-number').textContent = gameState.turn;
 
 		  // Update all resource values and changes
-		  for (let id in gameData.resources) {
-			document.getElementById(`${id}-value`).textContent = gameState.resources[id];
-			updateResourceChange(id, gameState.resourceChanges[id]);
-		  }
+			for (let id in gameData.resources) {
+			  const el = document.getElementById(`${id}-value`);
+			  if (!el) {
+				console.warn(`Missing element: ${id}-value`);
+				continue;
+			  }
+			  el.textContent = gameState.resources[id];
+			}
 
-		  // Update all building counts
-		  for (let id in gameData.buildings) {
+			// Update all building counts
+			for (let id in gameData.buildings) {
 			document.getElementById(`${id}-count`).textContent = gameState.buildings[id];
-		  }
+			}
 
-		  // Update button states
-		  updateButtonStates();
+			// Update button states
+			updateButtonStates();
 		}
 
         function updateResourceChange(resource, change) {
