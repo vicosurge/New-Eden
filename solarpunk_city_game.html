@@ -323,13 +323,13 @@
 			gameState.buildings[id] = 0;
 		  }
 
-		  calculateResourceChanges();
           console.log("GameData:", gameData);
           console.log("GameState:", gameState);
-		  updateDisplay();
           renderResources();
           renderBuildings();
           renderActions();
+		  calculateResourceChanges();
+		  updateDisplay();
 		}
 		
         // Building costs and effects
