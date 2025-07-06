@@ -273,77 +273,9 @@
             <button class="next-turn-btn" onclick="nextTurn()">🔄 Next Turn</button>
         </div>
 
-        <div class="game-board">
-            <div class="panel">
-                <h2>🌿 Resources</h2>
-                <div class="resources">
-                    <div class="resource">
-                        <div class="resource-name">🌾 Food</div>
-                        <div class="resource-value" id="food-value">50</div>
-                        <div class="resource-change" id="food-change">+0/turn</div>
-                    </div>
-                    <div class="resource">
-                        <div class="resource-name">⚡ Energy</div>
-                        <div class="resource-value" id="energy-value">30</div>
-                        <div class="resource-change" id="energy-change">+0/turn</div>
-                    </div>
-                    <div class="resource">
-                        <div class="resource-name">🔧 Materials</div>
-                        <div class="resource-value" id="materials-value">40</div>
-                        <div class="resource-change" id="materials-change">+0/turn</div>
-                    </div>
-                    <div class="resource">
-                        <div class="resource-name">👥 Population</div>
-                        <div class="resource-value" id="population-value">25</div>
-                        <div class="resource-change" id="population-change">+0/turn</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel">
-                <h2>🏗️ Buildings</h2>
-                <div class="buildings">
-                    <div class="building">
-                        <div class="building-name">🌱 Vertical Farms</div>
-                        <div class="building-count" id="farms-count">0</div>
-                    </div>
-                    <div class="building">
-                        <div class="building-name">☀️ Solar Arrays</div>
-                        <div class="building-count" id="solar-count">0</div>
-                    </div>
-                    <div class="building">
-                        <div class="building-name">♻️ Recycling Centers</div>
-                        <div class="building-count" id="recycling-count">0</div>
-                    </div>
-                    <div class="building">
-                        <div class="building-name">🏠 Eco-Homes</div>
-                        <div class="building-count" id="homes-count">0</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="panel">
-            <h2>🎯 Actions</h2>
-            <div class="actions">
-                <button class="action-btn" onclick="buildFarm()" id="build-farm-btn">
-                    Build Vertical Farm<br>
-                    <small>Cost: 20 Materials, 10 Energy</small>
-                </button>
-                <button class="action-btn" onclick="buildSolar()" id="build-solar-btn">
-                    Build Solar Array<br>
-                    <small>Cost: 25 Materials</small>
-                </button>
-                <button class="action-btn" onclick="buildRecycling()" id="build-recycling-btn">
-                    Build Recycling Center<br>
-                    <small>Cost: 30 Materials, 15 Energy</small>
-                </button>
-                <button class="action-btn" onclick="buildHomes()" id="build-homes-btn">
-                    Build Eco-Homes<br>
-                    <small>Cost: 35 Materials, 20 Energy</small>
-                </button>
-            </div>
-        </div>
+        <div class="resources" id="resources-panel"></div>
+		<div class="buildings" id="buildings-panel"></div>
+		<div class="actions" id="actions-panel"></div>
 
         <div class="log">
             <h3>📜 Community Log</h3>
@@ -420,23 +352,15 @@
             // Update turn
             document.getElementById('turn-number').textContent = gameState.turn;
 
-            // Update resources
-            document.getElementById('food-value').textContent = gameState.resources.food;
-            document.getElementById('energy-value').textContent = gameState.resources.energy;
-            document.getElementById('materials-value').textContent = gameState.resources.materials;
-            document.getElementById('population-value').textContent = gameState.resources.population;
+			for (let id in gameData.resources) {
+			  document.getElementById(`${id}-value`).textContent = gameState.resources[id];
+			  updateResourceChange(id, gameState.resourceChanges[id]);
+			}
 
-            // Update resource changes
-            updateResourceChange('food', gameState.resourceChanges.food);
-            updateResourceChange('energy', gameState.resourceChanges.energy);
-            updateResourceChange('materials', gameState.resourceChanges.materials);
-            updateResourceChange('population', gameState.resourceChanges.population);
+			for (let id in gameData.buildings) {
+			  document.getElementById(`${id}-count`).textContent = gameState.buildings[id];
+			}
 
-            // Update buildings
-            document.getElementById('farms-count').textContent = gameState.buildings.farms;
-            document.getElementById('solar-count').textContent = gameState.buildings.solar;
-            document.getElementById('recycling-count').textContent = gameState.buildings.recycling;
-            document.getElementById('homes-count').textContent = gameState.buildings.homes;
 
             // Update button states
             updateButtonStates();
@@ -590,9 +514,61 @@
             logEntries.scrollTop = logEntries.scrollHeight;
         }
 
+		function renderResources() {
+		  const container = document.getElementById("resources-panel");
+		  container.innerHTML = "";
+
+		  for (let id in gameData.resources) {
+			const res = gameData.resources[id];
+			container.innerHTML += `
+			  <div class="resource">
+				<div class="resource-name">${res.label}</div>
+				<div class="resource-value" id="${id}-value">0</div>
+				<div class="resource-change" id="${id}-change">+0/turn</div>
+			  </div>`;
+		  }
+		}
+
+		function renderBuildings() {
+		  const container = document.getElementById("buildings-panel");
+		  container.innerHTML = "";
+
+		  for (let id in gameData.buildings) {
+			const bld = gameData.buildings[id];
+			container.innerHTML += `
+			  <div class="building">
+				<div class="building-name">${bld.name}</div>
+				<div class="building-count" id="${id}-count">0</div>
+			  </div>`;
+		  }
+		}
+
+		function renderActions() {
+		  const container = document.getElementById("actions-panel");
+		  container.innerHTML = "";
+
+		  for (let id in gameData.buildings) {
+			const bld = gameData.buildings[id];
+
+			// Build readable cost string
+			const cost = Object.entries(bld.cost)
+			  .map(([res, val]) => `${val} ${gameData.resources[res]?.label || res}`)
+			  .join(", ");
+
+			container.innerHTML += `
+			  <button class="action-btn" onclick="buildBuilding('${id}')" id="build-${id}-btn">
+				Build ${bld.name}<br>
+				<small>Cost: ${cost}</small>
+			  </button>`;
+		  }
+		}
+
         // Initialize game
-        // calculateResourceChanges();
-        // updateDisplay();
+		renderResources();
+		renderBuildings();
+		renderActions();
+		calculateResourceChanges();
+		updateDisplay();
     </script>
 </body>
 </html>
