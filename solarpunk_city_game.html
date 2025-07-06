@@ -363,8 +363,12 @@
 		fetch('game_data.json')
 		  .then(response => response.json())
 		  .then(data => {
+			console.log("✅ Loaded game_data.json:", data); // DEBUG LINE
 			gameData = data;
 			initializeGame();
+		  })
+		  .catch(error => {
+			console.error("❌ Failed to load game_data.json:", error);
 		  });
 		
 		function initializeGame() {
