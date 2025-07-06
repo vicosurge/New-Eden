@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Eden - Solarpunk City Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #27ae60;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            color: #34495e;
+            margin-bottom: 15px;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            border-bottom: 2px solid #27ae60;
+            padding-bottom: 5px;
+        }
+
+        .resources {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .resource {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #27ae60;
+            transition: all 0.3s ease;
+        }
+
+        .resource:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .resource-name {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .resource-value {
+            font-size: 1.2em;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .resource-change {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .resource-change.positive {
+            color: #27ae60;
+        }
+
+        .resource-change.negative {
+            color: #e74c3c;
+        }
+
+        .buildings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .building {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #3498db;
+            text-align: center;
+        }
+
+        .building-name {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .building-count {
+            color: #3498db;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        .action-btn:disabled {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .turn-info {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .turn-number {
+            font-size: 1.5em;
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .next-turn-btn {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3);
+        }
+
+        .next-turn-btn:hover {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(142, 68, 173, 0.4);
+        }
+
+        .log {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .log h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #27ae60;
+            padding-bottom: 5px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .log-entry.positive {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+
+        .log-entry.negative {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .log-entry.neutral {
+            background: rgba(52, 73, 94, 0.1);
+            color: #34495e;
+        }
+
+        @media (max-width: 768px) {
+            .game-board {
+                grid-template-columns: 1fr;
+            }
+            
+            .resources, .buildings, .actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🌱 New Eden 🌱</h1>
+            <p>Rebuild civilization with sustainable technology and community spirit</p>
+            <p><em>The old world has ended, but hope grows from the ashes...</em></p>
+        </div>
+
+        <div class="turn-info">
+            <div class="turn-number">Turn: <span id="turn-number">1</span></div>
+            <button class="next-turn-btn" onclick="nextTurn()">🔄 Next Turn</button>
+        </div>
+
+        <div class="game-board">
+            <div class="panel">
+                <h2>🌿 Resources</h2>
+                <div class="resources">
+                    <div class="resource">
+                        <div class="resource-name">🌾 Food</div>
+                        <div class="resource-value" id="food-value">50</div>
+                        <div class="resource-change" id="food-change">+0/turn</div>
+                    </div>
+                    <div class="resource">
+                        <div class="resource-name">⚡ Energy</div>
+                        <div class="resource-value" id="energy-value">30</div>
+                        <div class="resource-change" id="energy-change">+0/turn</div>
+                    </div>
+                    <div class="resource">
+                        <div class="resource-name">🔧 Materials</div>
+                        <div class="resource-value" id="materials-value">40</div>
+                        <div class="resource-change" id="materials-change">+0/turn</div>
+                    </div>
+                    <div class="resource">
+                        <div class="resource-name">👥 Population</div>
+                        <div class="resource-value" id="population-value">25</div>
+                        <div class="resource-change" id="population-change">+0/turn</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>🏗️ Buildings</h2>
+                <div class="buildings">
+                    <div class="building">
+                        <div class="building-name">🌱 Vertical Farms</div>
+                        <div class="building-count" id="farms-count">0</div>
+                    </div>
+                    <div class="building">
+                        <div class="building-name">☀️ Solar Arrays</div>
+                        <div class="building-count" id="solar-count">0</div>
+                    </div>
+                    <div class="building">
+                        <div class="building-name">♻️ Recycling Centers</div>
+                        <div class="building-count" id="recycling-count">0</div>
+                    </div>
+                    <div class="building">
+                        <div class="building-name">🏠 Eco-Homes</div>
+                        <div class="building-count" id="homes-count">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>🎯 Actions</h2>
+            <div class="actions">
+                <button class="action-btn" onclick="buildFarm()" id="build-farm-btn">
+                    Build Vertical Farm<br>
+                    <small>Cost: 20 Materials, 10 Energy</small>
+                </button>
+                <button class="action-btn" onclick="buildSolar()" id="build-solar-btn">
+                    Build Solar Array<br>
+                    <small>Cost: 25 Materials</small>
+                </button>
+                <button class="action-btn" onclick="buildRecycling()" id="build-recycling-btn">
+                    Build Recycling Center<br>
+                    <small>Cost: 30 Materials, 15 Energy</small>
+                </button>
+                <button class="action-btn" onclick="buildHomes()" id="build-homes-btn">
+                    Build Eco-Homes<br>
+                    <small>Cost: 35 Materials, 20 Energy</small>
+                </button>
+            </div>
+        </div>
+
+        <div class="log">
+            <h3>📜 Community Log</h3>
+            <div id="log-entries">
+                <div class="log-entry neutral">Welcome to New Eden! Your small community of survivors is ready to rebuild civilization sustainably.</div>
+                <div class="log-entry positive">The solar panels from the old world still provide some energy, but we need to expand our infrastructure.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            turn: 1,
+            resources: {
+                food: 50,
+                energy: 30,
+                materials: 40,
+                population: 25
+            },
+            buildings: {
+                farms: 0,
+                solar: 0,
+                recycling: 0,
+                homes: 0
+            },
+            resourceChanges: {
+                food: 0,
+                energy: 0,
+                materials: 0,
+                population: 0
+            }
+        };
+
+        // Building costs and effects
+        const buildingData = {
+            farms: {
+                cost: { materials: 20, energy: 10 },
+                effect: { food: 8 }
+            },
+            solar: {
+                cost: { materials: 25 },
+                effect: { energy: 12 }
+            },
+            recycling: {
+                cost: { materials: 30, energy: 15 },
+                effect: { materials: 6 }
+            },
+            homes: {
+                cost: { materials: 35, energy: 20 },
+                effect: { population: 5 }
+            }
+        };
+
+        // Initialize game
+        function updateDisplay() {
+            // Update turn
+            document.getElementById('turn-number').textContent = gameState.turn;
+
+            // Update resources
+            document.getElementById('food-value').textContent = gameState.resources.food;
+            document.getElementById('energy-value').textContent = gameState.resources.energy;
+            document.getElementById('materials-value').textContent = gameState.resources.materials;
+            document.getElementById('population-value').textContent = gameState.resources.population;
+
+            // Update resource changes
+            updateResourceChange('food', gameState.resourceChanges.food);
+            updateResourceChange('energy', gameState.resourceChanges.energy);
+            updateResourceChange('materials', gameState.resourceChanges.materials);
+            updateResourceChange('population', gameState.resourceChanges.population);
+
+            // Update buildings
+            document.getElementById('farms-count').textContent = gameState.buildings.farms;
+            document.getElementById('solar-count').textContent = gameState.buildings.solar;
+            document.getElementById('recycling-count').textContent = gameState.buildings.recycling;
+            document.getElementById('homes-count').textContent = gameState.buildings.homes;
+
+            // Update button states
+            updateButtonStates();
+        }
+
+        function updateResourceChange(resource, change) {
+            const element = document.getElementById(resource + '-change');
+            element.textContent = (change >= 0 ? '+' : '') + change + '/turn';
+            element.className = 'resource-change ' + (change >= 0 ? 'positive' : 'negative');
+        }
+
+        function updateButtonStates() {
+            const buttons = ['farm', 'solar', 'recycling', 'homes'];
+            buttons.forEach(building => {
+                const button = document.getElementById('build-' + building + '-btn');
+                const cost = buildingData[building === 'farm' ? 'farms' : building].cost;
+                let canAfford = true;
+                
+                for (let resource in cost) {
+                    if (gameState.resources[resource] < cost[resource]) {
+                        canAfford = false;
+                        break;
+                    }
+                }
+                
+                button.disabled = !canAfford;
+            });
+        }
+
+        function calculateResourceChanges() {
+            // Reset changes
+            gameState.resourceChanges = { food: 0, energy: 0, materials: 0, population: 0 };
+
+            // Base consumption (population needs food and energy)
+            gameState.resourceChanges.food = -Math.floor(gameState.resources.population / 5);
+            gameState.resourceChanges.energy = -Math.floor(gameState.resources.population / 10);
+
+            // Building production
+            gameState.resourceChanges.food += gameState.buildings.farms * buildingData.farms.effect.food;
+            gameState.resourceChanges.energy += gameState.buildings.solar * buildingData.solar.effect.energy;
+            gameState.resourceChanges.materials += gameState.buildings.recycling * buildingData.recycling.effect.materials;
+            gameState.resourceChanges.population += gameState.buildings.homes * buildingData.homes.effect.population;
+
+            // Cap population growth based on available homes
+            const maxPopulation = 25 + (gameState.buildings.homes * 10);
+            if (gameState.resources.population >= maxPopulation) {
+                gameState.resourceChanges.population = 0;
+            }
+        }
+
+        function buildBuilding(type) {
+            const cost = buildingData[type].cost;
+            
+            // Check if we can afford it
+            for (let resource in cost) {
+                if (gameState.resources[resource] < cost[resource]) {
+                    return false;
+                }
+            }
+
+            // Pay the cost
+            for (let resource in cost) {
+                gameState.resources[resource] -= cost[resource];
+            }
+
+            // Build the building
+            gameState.buildings[type]++;
+            
+            // Recalculate resource changes
+            calculateResourceChanges();
+            updateDisplay();
+            
+            return true;
+        }
+
+        function buildFarm() {
+            if (buildBuilding('farms')) {
+                addLogEntry('Built a Vertical Farm! Fresh produce for the community.', 'positive');
+            }
+        }
+
+        function buildSolar() {
+            if (buildBuilding('solar')) {
+                addLogEntry('Built a Solar Array! Clean energy powers our future.', 'positive');
+            }
+        }
+
+        function buildRecycling() {
+            if (buildBuilding('recycling')) {
+                addLogEntry('Built a Recycling Center! Turning waste into resources.', 'positive');
+            }
+        }
+
+        function buildHomes() {
+            if (buildBuilding('homes')) {
+                addLogEntry('Built Eco-Homes! Sustainable living spaces for our growing community.', 'positive');
+            }
+        }
+
+        function nextTurn() {
+            gameState.turn++;
+            
+            // Apply resource changes
+            for (let resource in gameState.resourceChanges) {
+                gameState.resources[resource] += gameState.resourceChanges[resource];
+                gameState.resources[resource] = Math.max(0, gameState.resources[resource]);
+            }
+
+            // Check for events
+            checkTurnEvents();
+
+            // Recalculate for next turn
+            calculateResourceChanges();
+            updateDisplay();
+        }
+
+        function checkTurnEvents() {
+            // Random events based on turn and game state
+            if (gameState.turn % 5 === 0) {
+                const events = [
+                    { message: 'A trader arrives! They exchange 10 materials for 15 food.', action: () => { gameState.resources.materials += 10; gameState.resources.food -= 15; }, condition: () => gameState.resources.food >= 15 },
+                    { message: 'Scavengers find useful materials in the ruins!', action: () => { gameState.resources.materials += 20; }, condition: () => true },
+                    { message: 'Clear skies boost solar energy production this turn!', action: () => { gameState.resources.energy += gameState.buildings.solar * 5; }, condition: () => gameState.buildings.solar > 0 }
+                ];
+                
+                const availableEvents = events.filter(event => event.condition());
+                if (availableEvents.length > 0) {
+                    const event = availableEvents[Math.floor(Math.random() * availableEvents.length)];
+                    event.action();
+                    addLogEntry(event.message, 'positive');
+                }
+            }
+
+            // Check for low resources
+            if (gameState.resources.food <= 0) {
+                addLogEntry('Food shortage! Population growth has stopped.', 'negative');
+                gameState.resourceChanges.population = Math.min(0, gameState.resourceChanges.population);
+            }
+            
+            if (gameState.resources.energy <= 0) {
+                addLogEntry('Energy shortage! Some systems are shutting down.', 'negative');
+            }
+        }
+
+        function addLogEntry(message, type) {
+            const logEntries = document.getElementById('log-entries');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + type;
+            entry.textContent = `Turn ${gameState.turn}: ${message}`;
+            logEntries.appendChild(entry);
+            logEntries.scrollTop = logEntries.scrollHeight;
+        }
+
+        // Initialize game
+        calculateResourceChanges();
+        updateDisplay();
+    </script>
+</body>
+</html>
