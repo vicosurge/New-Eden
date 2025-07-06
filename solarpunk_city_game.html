@@ -348,23 +348,24 @@
         };
 
         // Initialize game
-        function updateDisplay() {
-            // Update turn
-            document.getElementById('turn-number').textContent = gameState.turn;
+		function updateDisplay() {
+		  // Update turn
+		  document.getElementById('turn-number').textContent = gameState.turn;
 
-			for (let id in gameData.resources) {
-			  document.getElementById(`${id}-value`).textContent = gameState.resources[id];
-			  updateResourceChange(id, gameState.resourceChanges[id]);
-			}
+		  // Update all resource values and changes
+		  for (let id in gameData.resources) {
+			document.getElementById(`${id}-value`).textContent = gameState.resources[id];
+			updateResourceChange(id, gameState.resourceChanges[id]);
+		  }
 
-			for (let id in gameData.buildings) {
-			  document.getElementById(`${id}-count`).textContent = gameState.buildings[id];
-			}
+		  // Update all building counts
+		  for (let id in gameData.buildings) {
+			document.getElementById(`${id}-count`).textContent = gameState.buildings[id];
+		  }
 
-
-            // Update button states
-            updateButtonStates();
-        }
+		  // Update button states
+		  updateButtonStates();
+		}
 
         function updateResourceChange(resource, change) {
             const element = document.getElementById(resource + '-change');
